@@ -1,1 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>背词 · 错词攻克</title>
+<style>
+:root{
+  --green:#10b981;--green-d:#059669;--green-l:#d1fae5;
+  --red:#f43f5e;--red-l:#ffe4e6;--amber:#f59e0b;--amber-l:#fef3c7;
+  --bg:#f3f5f7;--card:#fff;--text:#111827;--muted:#98a2b3;--line:#eef1f4;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+#app{max-width:560px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding-bottom:70px}
+header{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line);
+  padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:17px;margin:0;font-weight:600;letter-spacing:.3px}
+main{padding:14px 14px 24px;flex:1}
+.card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(17,24,39,.05)}
+h2{font-size:15px;margin:0 0 10px;font-weight:600}
+h3{font-size:15px;margin:0 0 12px}
+.muted{color:var(--muted);font-size:13px}
+.center{text-align:center}
+.mt10{margin-top:10px}.mt16{margin-top:16px}
+.row{display:flex;align-items:center}
+.gap8{gap:8px}
+.row-between{display:flex;align-items:center;justify-content:space-between}
+.btn{border:none;border-radius:12px;padding:12px 14px;font-size:15px;font-weight:600;cursor:pointer;
+  background:#f1f4f7;color:#374151;transition:.15s;font-family:inherit}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--green);color:#fff}
+.btn.ok{background:var(--green-l);color:var(--green-d)}
+.btn.warn{background:var(--amber-l);color:#b45309}
+.btn.no{background:var(--red-l);color:#e11d48}
+.btn.ghost{background:#fff;border:1px solid var(--line);color:#4b5563;flex:1}
+.btn.block{display:block;width:100%}
+.icon-btn{border:none;background:transparent;font-size:20px;cursor:pointer;color:#6b7280;padding:4px 8px}
+.icon{border:none;background:#f1f4f7;border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--green-l);color:var(--green-d)}
+.tag.gray{background:#f1f4f7;color:#6b7280}
+.tag.warn{background:var(--amber-l);color:#b45309}
+.tag.red{background:var(--red-l);color:#e11d48}
 
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 14px}
+.plan-item{background:#f8fafb;border-radius:12px;padding:10px;text-align:center}
+.plan-item .num{font-size:22px;font-weight:700;color:var(--green-d)}
+.plan-item .lbl{font-size:12px;color:var(--muted);margin-top:2px}
+
+.session-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.bar{flex:1;height:6px;background:#e6ebf0;border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green);border-radius:3px;transition:.3s}
+.study{text-align:center;padding:22px 16px}
+.word-line{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0 4px}
+.word{font-size:34px;font-weight:700;letter-spacing:.5px;word-break:break-word}
+.phon{color:var(--muted);font-size:14px;margin-bottom:8px}
+.meaning{font-size:18px;color:#111827;background:#f8fafb;border-radius:12px;padding:12px;margin-top:12px}
+.meaning.big{font-size:22px;font-weight:600;background:#f8fafb}
+.hintline{color:var(--muted);font-size:13px;margin-top:14px}
+.btns3{display:flex;gap:8px;margin-top:22px}
+.btns3 .btn{flex:1;padding:14px 6px}
+.tip{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6}
+.bigplay{width:84px;height:84px;border-radius:50%;border:none;background:var(--green-l);color:var(--green-d);
+  font-size:34px;cursor:pointer;margin:8px auto}
+.input{width:100%;padding:14px;border:1.5px solid #e3e8ee;border-radius:12px;font-size:18px;
+  text-align:center;outline:none;font-family:inherit;background:#fbfcfd}
+.input:focus{border-color:var(--green);background:#fff}
+.opts{display:grid;gap:8px;margin-top:16px}
+.opt{display:flex;align-items:center;gap:10px;text-align:left;background:#f8fafb;border:1.5px solid transparent;
+  border-radius:12px;padding:13px 14px;font-size:15px;cursor:pointer;font-family:inherit;color:#111827}
+.opt b{color:var(--muted);font-weight:600}
+.opt.right{border-color:var(--green);background:var(--green-l)}
+.opt.wrong{border-color:var(--red);background:var(--red-l)}
+.fb{font-size:20px;font-weight:700;margin-bottom:6px}
+.fb.ok{color:var(--green-d)}.fb.no{color:var(--red)}
+.done-emoji{font-size:48px}
+
+textarea{width:100%;min-height:150px;border:1.5px solid #e3e8ee;border-radius:12px;padding:12px;
+  font-size:14px;font-family:inherit;outline:none;resize:vertical;background:#fbfcfd;line-height:1.7}
+textarea:focus{border-color:var(--green);background:#fff}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;border:none;background:#fff;border:1px solid var(--line);border-radius:999px;
+  padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:#4b5563}
+.chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+.wrow{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.wrow:last-child{border-bottom:none}
+.wrow .w{font-weight:600;font-size:16px}
+.wrow .m{color:#6b7280;font-size:13px;margin-top:2px}
+.wrow .acts{display:flex;gap:6px;margin-left:auto}
+.mini{border:none;background:#f1f4f7;border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer;color:#4b5563;font-family:inherit}
+
+.barline{display:flex;align-items:center;gap:10px;margin:8px 0}
+.barline .lbl{width:48px;color:#6b7280;font-size:13px;flex:none}
+.barline .track{flex:1;height:10px;background:#eef2f5;border-radius:5px;overflow:hidden}
+.barline .track i{display:block;height:100%;border-radius:5px}
+.barline .val{width:44px;text-align:right;font-size:13px;color:#6b7280}
+.sec-title{font-size:15px;font-weight:600;margin:0 0 10px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.ring-wrap{display:flex;align-items:center;gap:18px;justify-content:center;padding:6px 0 14px}
+.ring{width:130px;height:130px}
+.ring-num{font-size:13px;color:var(--muted)}
+.ring-num b{display:block;font-size:22px;color:#111827}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{background:#f6f8fa;color:#6b7280;font-weight:500;padding:9px 10px;text-align:center;font-size:13px}
+.tbl td{padding:10px;text-align:center;border-top:1px solid var(--line)}
+.tbl td.g{color:var(--green-d);font-weight:600}
+.tbl td.r{color:var(--red);font-weight:600}
+.err{border-bottom:1px dashed var(--line);padding:12px 0}
+.err:last-child{border-bottom:none}
+.err .w{font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px}
+.err .meta{font-size:13px;color:var(--muted);margin-top:6px}
+
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:40;display:flex;background:#fff;
+  border-top:1px solid var(--line);max-width:560px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{flex:1;border:none;background:transparent;padding:9px 0 11px;font-size:11px;color:#9aa3ad;
+  cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tabbar button span{font-size:19px;line-height:1}
+.tabbar button.active{color:var(--green)}
+
+.overlay{position:fixed;inset:0;background:rgba(17,24,39,.4);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:#fff;width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom))}
+.sheet label{display:flex;align-items:center;justify-content:space-between;padding:10px 0;font-size:14px}
+.sheet input[type=number]{width:90px;padding:9px;border:1.5px solid #e3e8ee;border-radius:10px;text-align:center;font-size:15px;font-family:inherit}
+.tgs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.tg{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer;font-family:inherit}
+.tg.on{border-color:var(--green);background:var(--green-l);color:var(--green-d);font-weight:600}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(12px);background:rgba(17,24,39,.9);
+  color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99;
+  max-width:86vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>背词 · 错词攻克</h1>
+    <button class="icon-btn" data-act="openSettings">⚙︎</button>
+  </header>
+  <main id="view"></main>
+  <nav class="tabbar">
+    <button data-act="tab" data-tab="study"><span>📖</span>背诵</button>
+    <button data-act="tab" data-tab="bank"><span>📚</span>词库</button>
+    <button data-act="tab" data-tab="report"><span>📊</span>报告</button>
+  </nav>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* ================= 常量 & 工具 ================= */
+const TYPES={spellAudio:'听音拼写',spellMeaning:'看中文拼写',choiceAudio:'听音辨义',choiceEn2Cn:'英译中',choiceCn2En:'中译英'};
+const CHOICE=new Set(['choiceAudio','choiceEn2Cn','choiceCn2En']);
+const LS='vocab_app_v1';
+const POS='n|v|vt|vi|adj|adv|prep|conj|pron|art|num|int|interj|aux|phr|abbr|pl';
+const POS_END=new RegExp('[\\s,，;；]*\\b('+POS+')\\.?$','i');
+const POS_START=new RegExp('^('+POS+')\\.?[\\s、,，]*','i');
+
+function uid(){return Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function todayStr(d){const x=d?new Date(d):new Date();const t=new Date(x.getTime()-x.getTimezoneOffset()*60000);return t.toISOString().slice(0,10)}
+function addDays(ds,n){const d=new Date(ds+'T00:00:00');d.setDate(d.getDate()+n);return todayStr(d)}
+function norm(s){return (s||'').trim().toLowerCase().replace(/[’]/g,"'").replace(/\s+/g,' ')}
+
+/* ================= 数据 ================= */
+const DEFAULT_DB=()=>({
+  v:1,
+  words:[],
+  settings:{newPerDay:20,reviewPerDay:30,testPerDay:15,rate:.9,
+    types:['spellAudio','spellMeaning','choiceAudio','choiceEn2Cn','choiceCn2En']},
+  progress:{},history:{},session:null
+});
+
+let DB=(function(){
+  try{
+    const raw=localStorage.getItem(LS);
+    if(raw){
+      const d=JSON.parse(raw),base=DEFAULT_DB();
+      return Object.assign(base,d,{settings:Object.assign(base.settings,d.settings||{})});
+    }
+  }catch(e){}
+  return DEFAULT_DB();
+})();
+
+const UI={tab:'study',revealed:false,hinted:false,feedback:null,playedFor:null,
+          bankFilter:'all',bankQuery:'',bulkText:'',reportDate:todayStr(),
+          settingsOpen:false,choicePicked:null};
+
+function saveDB(){try{localStorage.setItem(LS,JSON.stringify(DB))}catch(e){}}
+const byId=id=>DB.words.find(w=>w.id===id);
+const getHist=(d)=>{const k=d||todayStr();return DB.history[k]||(DB.history[k]={
+  learn:{new:{know:0,hint:0,unknown:0},review:{know:0,hint:0,unknown:0}},tests:{},errors:[]})};
+
+/* ================= 语音 ================= */
+function speak(text){
+  if(!('speechSynthesis'in window)){toast('当前浏览器不支持发音');return}
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=DB.settings.rate||0.9;
+    speechSynthesis.speak(u);
+  }catch(e){toast('发音失败')}
+}
+
+/* ================= 词条解析（核心：支持任意粘贴格式） ================= */
+function parseLine(raw){
+  let line=String(raw==null?'':raw).replace(/\u00a0/g,' ').replace(/\u3000/g,' ').replace(/\t/g,'  ').trim();
+  if(!line)return null;
+
+  /* 去掉行首序号 / 项目符号 */
+  line=line.replace(/^[\s>*•·◦▪※#-–—]+/,'')
+           .replace(/^\d+\s*[\.、\)\]）:：]\s*/,'')
+           .trim();
+  if(!line)return null;
+  if(!/[A-Za-z]/.test(line))return null;
+  if(/^(unit|lesson|module|chapter|part|list|word\s*list|vocabulary|第[一二三四五六七八九十百\d]{1,4}[课单列组页])/i.test(line))return null;
+  line=line.replace(/\s{2,}/g,' ').trim();
+
+  /* 抽取音标：只认带 IPA 符号的 /.../ 或 [...] */
+  let ph='';
+  const pm=line.match(/[\/\[]([^\/\[\]]{1,50})[\/\]]/);
+  if(pm&&/[ˈˌːəɪʊæɑɔʌθðʃʒŋɜɒæʧʤ]/.test(pm[1])){
+    ph=pm[1].trim();
+    line=(line.slice(0,pm.index)+' '+line.slice(pm.index+pm[0].length)).replace(/\s{2,}/g,' ').trim();
+  }
+  if(!line)return null;
+
+  /* 拆单词与释义 */
+  let left='',right='';
+  const cn=line.search(/[\u4e00-\u9fa5]/);
+  if(cn>0){ left=line.slice(0,cn); right=line.slice(cn); }
+  else if(cn===0){ return null; }
+  else{
+    const m=line.match(/^(.+?)\s*[|,;；:：=—–]\s*(.+)$/);
+    if(m){ left=m[1]; right=m[2]; }
+    else { left=line; right=''; }
+  }
+
+  left=left.replace(/[\s|,，;；:：=\-–—\/]+$/,'').trim();
+  left=left.replace(POS_END,'').trim();
+  right=String(right||'').replace(/^[\s|,，;；:：=\-–—\/]+/,'').trim();
+  right=right.replace(POS_START,'').trim();
+  right=right.replace(/^\d+\s*[\.、\)\]）]\s*/,'').trim();
+
+  const wm=left.match(/^[A-Za-z][A-Za-z'’\-\. ]*/);
+  left=(wm?wm[0]:'').trim().replace(/[\.\s]+$/,'').trim();
+  if(!left||left.length>48)return null;
+
+  return {w:left,m:right,ph};
+}
+
+function parseBulk(text){
+  const map=new Map(),items=[];let bad=0;
+  String(text||'').split(/\r?\n/).forEach(l=>{
+    const r=parseLine(l);
+    if(!r){ if(String(l||'').trim())bad++; return; }
+    const k=r.w.toLowerCase();
+    if(map.has(k)){
+      const ex=map.get(k);
+      if(!ex.m&&r.m)ex.m=r.m;
+      if(!ex.ph&&r.ph)ex.ph=r.ph;
+      return;
+    }
+    map.set(k,r);items.push(r);
+  });
+  return {items,bad};
+}
+
+function bulkStats(){
+  const {items,bad}=parseBulk(UI.bulkText);
+  const exist=new Set(DB.words.map(w=>w.w.toLowerCase()));
+  let dup=0;
+  items.forEach(r=>{if(exist.has(r.w.toLowerCase()))dup++});
+  return {total:items.length,dup,bad,add:items.length-dup};
+}
+
+/* ================= 题型 ================= */
+function pickType(w){
+  let en=DB.settings.types.filter(t=>TYPES[t]);
+  if(!en.length)en=['spellMeaning'];
+  if(DB.words.length<3)en=en.filter(t=>!CHOICE.has(t));
+  if(!en.length)en=['spellMeaning'];
+  if(w&&w.weak&&en.includes(w.weak)&&Math.random()<.7)return w.weak;
+  return en[Math.floor(Math.random()*en.length)];
+}
+function makeOptions(w,type){
+  const target=type==='choiceCn2En'?w.w:w.m;
+  const pool=DB.words.filter(x=>x.id!==w.id&&(type==='choiceCn2En'?x.w:x.m));
+  const seen=new Set([target]);const others=[];
+  for(const x of shuffle(pool)){
+    const v=type==='choiceCn2En'?x.w:x.m;
+    if(!seen.has(v)){seen.add(v);others.push(v)}
+    if(others.length>=3)break;
+  }
+  return {list:shuffle([target,...others]),answer:target};
+}
+function newEntry(w,mode,extra){
+  const e={id:uid(),wordId:w.id,mode,done:false,result:null,repeat:false,kind:'review'};
+  if(mode==='test'){
+    let t=pickType(w);
+    if(!w.m)t='spellAudio';            /* 没有中文释义 → 只能听音拼写 */
+    e.type=t;
+    if(CHOICE.has(t)){
+      const o=makeOptions(w,t);
+      if(o.list.length<2)e.type='spellAudio'; else e.opts=o;
+    }
+  }
+  Object.assign(e,extra||{});
+  return e;
+}
+
+/* ================= 会话 ================= */
+function currentEntry(){
+  if(!DB.session)return null;
+  const i=DB.session.entries.findIndex(e=>!e.done);
+  if(i<0)return null;
+  return {entry:DB.session.entries[i],index:i};
+}
+
+function startSession(kind){
+  const today=todayStr(),s=DB.settings;
+  const prog=DB.progress[today]||(DB.progress[today]={newDone:0,reviewDone:0,testDone:0});
+  const entries=[];let learnPool=[];
+
+  if(kind!=='test'){
+    const newLeft=Math.max(0,s.newPerDay-(prog.newDone||0));
+    const revLeft=Math.max(0,s.reviewPerDay-(prog.reviewDone||0));
+    const news=DB.words.filter(w=>w.status==='new').slice(0,newLeft);
+    const reps=DB.words.filter(w=>w.status==='learning'&&!((w.repeatsLeft||0)>0)&&(w.nextDue||'')<=today).slice(0,revLeft);
+    learnPool=news.concat(reps);
+    const pend=DB.words.filter(w=>w.status!=='mastered'&&(w.repeatsLeft||0)>0&&!learnPool.includes(w)).slice(0,15);
+    learnPool=learnPool.concat(pend);
+  }
+
+  const learnSet=new Set(learnPool.map(w=>w.id));
+  learnPool.forEach(w=>entries.push(newEntry(w,'learn',{kind:w.status==='new'?'new':'review'})));
+
+  let testPool=[];
+  if(kind==='test'){
+    testPool=DB.words.filter(w=>w.status!=='mastered')
+      .sort((a,b)=>(a.lastSeen||0)-(b.lastSeen||0)).slice(0,s.testPerDay);
+  }else{
+    testPool=learnPool.slice();
+  }
+  testPool.forEach(w=>entries.push(newEntry(w,'test',{kind:learnSet.has(w.id)?'review':'review'})));
+
+  if(!entries.length){toast('没有可背的单词，先去词库粘贴录入吧');return}
+  DB.session={date:today,kind,entries,createdAt:Date.now()};
+  UI.revealed=false;UI.hinted=false;UI.feedback=null;UI.playedFor=null;UI.choicePicked=null;
+  saveDB();render();
+}
+
+/* 错词穿插：间隔 4 / 9 / 16 个环节，并跨"背词区 / 测试区" */
+function scheduleRepeat(w,fromIndex,attempt){
+  if(!DB.session)return;
+  const entries=DB.session.entries;
+  for(let i=entries.length-1;i>fromIndex;i--){
+    if(entries[i].wordId===w.id&&!entries[i].done)entries.splice(i,1);
+  }
+  const gaps=[4,9,16];
+  let gap=gaps[Math.min(attempt,2)]+(Math.random()<.5?-1:1);
+  gap=Math.max(2,gap);
+  let pos=Math.min(fromIndex+gap,entries.length);
+  while(pos<entries.length&&entries[pos].wordId===w.id)pos++;
+  const target=entries[pos];
+  const mode=(target&&target.mode==='test')?'test':'learn';
+  entries.splice(pos,0,newEntry(w,mode,{kind:'review',repeat:true}));
+}
+
+function removeFutureRepeats(w,fromIndex){
+  if(!DB.session)return;
+  const entries=DB.session.entries;
+  for(let i=entries.length-1;i>fromIndex;i--){
+    if(entries[i].wordId===w.id&&!entries[i].done&&entries[i].repeat)entries.splice(i,1);
+  }
+}
+function markMastered(w){
+  w.status='mastered';w.repeatsLeft=0;w.masteredAt=Date.now();
+  const cur=currentEntry();
+  if(cur)removeFutureRepeats(w,cur.index);
+}
+function bumpProgress(e){
+  if(e.repeat)return;
+  const today=todayStr();
+  const p=DB.progress[today]||(DB.progress[today]={newDone:0,reviewDone:0,testDone:0});
+  if(e.mode==='learn'){
+    if(e.kind==='new')p.newDone=(p.newDone||0)+1;else p.reviewDone=(p.reviewDone||0)+1;
+  }else p.testDone=(p.testDone||0)+1;
+}
+
+/* ================= 作答 ================= */
+function onLearn(res){
+  const cur=currentEntry();if(!cur)return;
+  const e=cur.entry,w=byId(e.wordId);
+  if(!w)return;
+  if(res==='hint'){UI.revealed=true;UI.hinted=true;render();return}
+
+  const hist=getHist(todayStr());
+  const bucket=e.kind==='new'?hist.learn.new:hist.learn.review;
+  w.seen=(w.seen||0)+1;w.lastSeen=Date.now();
+
+  if(res==='unknown'){
+    bucket.unknown++;
+    w.wrong=(w.wrong||0)+1;
+    if(w.status==='new')w.status='learning';
+    w.repeatsLeft=3;
+    w.nextDue=addDays(todayStr(),1);
+    scheduleRepeat(w,cur.index,0);
+    hist.errors.push({wordId:w.id,type:'learn',answer:'不认识',at:Date.now()});
+  }else{
+    bucket[UI.hinted?'hint':'know']++;
+    if(!UI.hinted)w.right=(w.right||0)+1;
+    if(e.repeat||(w.repeatsLeft||0)>0){
+      w.repeatsLeft=Math.max(0,(w.repeatsLeft||0)-1);
+      if(w.repeatsLeft>0)scheduleRepeat(w,cur.index,3-w.repeatsLeft);
+      else markMastered(w);
+    }else markMastered(w);
+  }
+  e.done=true;e.result=res==='unknown'?'wrong':'right';
+  bumpProgress(e);
+  UI.revealed=false;UI.hinted=false;UI.feedback=null;UI.choicePicked=null;
+  saveDB();render();
+}
+
+function finishTest(e,w,ok,given){
+  const cur=currentEntry();
+  const hist=getHist(todayStr());
+  const t=hist.tests[e.type]||(hist.tests[e.type]={total:0,right:0});
+  t.total++;if(ok)t.right++;
+  w.seen=(w.seen||0)+1;w.lastSeen=Date.now();
+
+  if(ok){
+    w.right=(w.right||0)+1;
+    if(e.repeat||(w.repeatsLeft||0)>0){
+      w.repeatsLeft=Math.max(0,(w.repeatsLeft||0)-1);
+      if(w.repeatsLeft>0)scheduleRepeat(w,cur.index,3-w.repeatsLeft);
+      else markMastered(w);
+    }else{
+      if(w.status==='new')w.status='learning';
+      if(w.status!=='mastered')w.nextDue=addDays(todayStr(),3);
+    }
+  }else{
+    w.wrong=(w.wrong||0)+1;
+    w.weak=e.type;
+    if(w.status!=='learning')w.status='learning';
+    w.repeatsLeft=3;
+    w.nextDue=addDays(todayStr(),1);
+    scheduleRepeat(w,cur.index,0);
+    hist.errors.push({wordId:w.id,type:e.type,answer:given||'未作答',at:Date.now()});
+  }
+  e.done=true;e.result=ok?'right':'wrong';
+  bumpProgress(e);
+  UI.feedback={ok,given};UI.choicePicked=null;
+  saveDB();render();
+}
+function onSubmitSpell(){
+  const cur=currentEntry();if(!cur)return;
+  const e=cur.entry,w=byId(e.wordId);
+  const el=document.getElementById('answer');
+  const given=(el?el.value:'').trim();
+  if(!given){toast('先输入答案');return}
+  finishTest(e,w,norm(given)===norm(w.w),given);
+}
+
+/* ================= 视图 ================= */
+function render(){
+  document.getElementById('view').innerHTML=
+    (UI.tab==='study'?viewStudy():UI.tab==='bank'?viewBank():viewReport())+(UI.settingsOpen?sheet():'');
+  document.querySelectorAll('.tabbar button').forEach(b=>{
+    b.classList.toggle('active',b.dataset.tab===UI.tab);
+  });
+  afterRender();
+}
+
+function viewStudy(){
+  const s=DB.session;
+  const undone=s?s.entries.filter(e=>!e.done).length:0;
+  if(s&&undone>0)return cardStudy();
+  if(s&&undone===0)return cardFinish();
+  return cardPlan();
+}
+
+function cardPlan(){
+  const today=todayStr(),s=DB.settings;
+  const prog=DB.progress[today]||{newDone:0,reviewDone:0,testDone:0};
+  const newLeft=DB.words.filter(w=>w.status==='new').length;
+  const dueLeft=DB.words.filter(w=>w.status==='learning'&&!((w.repeatsLeft||0)>0)&&(w.nextDue||'')<=today).length;
+  const pend=DB.words.filter(w=>w.status!=='mastered'&&(w.repeatsLeft||0)>0).length;
+  const total=DB.words.length,mastered=DB.words.filter(w=>w.status==='mastered').length;
+  const noMean=DB.words.filter(w=>!w.m).length;
+
+  const empty=total===0?`
+    <div class="card">
+      <h2>还没有单词</h2>
+      <div class="muted" style="line-height:1.8">总词库是空的。去「词库」页把整份词表<b>粘贴</b>进去，一键导入即可开始。</div>
+      <button class="btn primary block mt16" data-act="tab" data-tab="bank">去粘贴词表</button>
+    </div>`:'';
+
+  return empty+`
+  <div class="card">
+    <div class="row-between"><h2 style="margin:0">今日计划 · ${today}</h2>
+      <span class="tag gray">词库 ${total} · 已掌握 ${mastered}</span></div>
+    <div class="plan-grid">
+      <div class="plan-item"><div class="num">${Math.min(s.newPerDay,newLeft)}</div><div class="lbl">新学 (存${newLeft})</div></div>
+      <div class="plan-item"><div class="num">${Math.min(s.reviewPerDay,dueLeft)}</div><div class="lbl">复习 (到期${dueLeft})</div></div>
+      <div class="plan-item"><div class="num">${pend}</div><div class="lbl">待强化</div></div>
+    </div>
+    <div class="muted" style="margin-bottom:12px">今日已完成：新学 ${prog.newDone||0} · 复习 ${prog.reviewDone||0} · 测试 ${prog.testDone||0}
+      ${noMean?`<br>其中 ${noMean} 个词没有释义，只做「听音拼写」`:''}</div>
+    <button class="btn primary block" data-act="start" data-kind="mix">开始今日背词 + 测试</button>
+    <div class="row gap8 mt10">
+      <button class="btn ghost" data-act="start" data-kind="learn">只背词</button>
+      <button class="btn ghost" data-act="start" data-kind="test">只测试</button>
+      <button class="btn ghost" data-act="openSettings">改计划</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>规则说明</h2>
+    <div class="muted" style="line-height:1.9">
+      · 背词时选「认识」= 已掌握，<b>后续不再出现</b>；<br>
+      · 选「不认识」= 该词之后会<b>穿插出现 3 次</b>（间隔逐渐拉长，跨背词与测试）；<br>
+      · 3 次当中再选「不认识」，计数<b>重置为 3 次</b>；<br>
+      · 测试（听音拼写 / 看中文拼写 / 选择）错了的词，同样会在后续流程中<b>穿插重复 3 次</b>。
+    </div>
+  </div>`;
+}
+
+function cardStudy(){
+  const cur=currentEntry();
+  if(!cur)return cardFinish();
+  const e=cur.entry,w=byId(e.wordId);
+  const total=DB.session.entries.length,done=total-DB.session.entries.filter(x=>!x.done).length;
+  const head=`<div class="session-bar">
+      <div class="bar"><i style="width:${Math.round(done/total*100)}%"></i></div>
+      <span class="muted" style="white-space:nowrap">${done}/${total}</span>
+      <button class="mini" data-act="endSession">结束</button>
+    </div>`;
+  return head+(e.mode==='learn'?learnCard(e,w):testCard(e,w));
+}
+
+function learnCard(e,w){
+  if(UI.feedback)return `<div class="card study"><div class="fb ${UI.feedback.ok?'ok':'no'}">${UI.feedback.ok?'✓':'✗'}</div>
+    <div class="word">${esc(w.w)}</div><div class="meaning">${esc(w.m||'（无释义）')}</div>
+    <button class="btn primary block mt16" data-act="next">继续</button></div>`;
+  const need=(w.repeatsLeft||0);
+  const tagRep=(e.repeat||need>0)?`<span class="tag warn">待强化 · 还需 ${need} 次</span>`:'';
+  const tagKind=e.kind==='new'?'<span class="tag">新词</span>':'<span class="tag gray">复习</span>';
+  return `
+  <div class="card study">
+    <div class="row gap8" style="justify-content:center">${tagKind}${tagRep}</div>
+    <div class="word-line"><span class="word">${esc(w.w)}</span>
+      <button class="icon" data-act="play" data-w="${esc(w.w)}">🔊</button></div>
+    ${w.ph?`<div class="phon">${esc(w.ph)}</div>`:''}
+    ${UI.revealed?`<div class="meaning">${esc(w.m||'（无释义）')}</div>`
+                 :`<div class="hintline">先在心里回想意思，再选择</div>`}
+    <div class="btns3">
+      <button class="btn ok" data-act="learn" data-res="know">认识</button>
+      ${UI.revealed?'':`<button class="btn warn" data-act="learn" data-res="hint">提示</button>`}
+      <button class="btn no" data-act="learn" data-res="unknown">不认识</button>
+    </div>
+    <div class="tip">认识 = 会了，后续不再出现 ｜ 不认识 = 之后穿插 3 次</div>
+  </div>`;
+}
+
+function optionButtons(e){
+  return `<div class="opts">${e.opts.list.map((o,i)=>{
+    let cls='';
+    if(UI.choicePicked!==null){
+      if(o===e.opts.answer)cls='right';
+      else if(o===UI.choicePicked)cls='wrong';
+    }
+    return `<button class="opt ${cls}" data-act="choose" data-val="${esc(o)}"><b>${'ABCD'[i]}</b><span>${esc(o)}</span></button>`;
+  }).join('')}</div>`;
+}
+
+function testCard(e,w){
+  if(UI.feedback){
+    const f=UI.feedback;
+    return `<div class="card study">
+      <div class="fb ${f.ok?'ok':'no'}">${f.ok?'✓ 正确':'✗ 错误'}</div>
+      <div class="word-line"><span class="word">${esc(w.w)}</span>
+        <button class="icon" data-act="play" data-w="${esc(w.w)}">🔊</button></div>
+      ${w.ph?`<div class="phon">${esc(w.ph)}</div>`:''}
+      <div class="meaning">${esc(w.m||'')}</div>
+      ${f.ok?'':`<div class="muted mt10">你的答案：${esc(f.given||'未作答')}</div>
+        <div class="tag warn mt10">已加入强化队列，后续还会穿插出现 3 次</div>`}
+      <button class="btn primary block mt16" data-act="next">继续</button>
+    </div>`;
+  }
+  const need=w.repeatsLeft||0;
+  const tags=`<span class="tag gray">${TYPES[e.type]}</span>${(e.repeat||need>0)?`<span class="tag warn">待强化 ${need}</span>`:''}`;
+  let body='';
+  if(e.type==='spellAudio'){
+    body=`<div class="center"><button class="bigplay" data-act="play" data-w="${esc(w.w)}">🔊</button></div>
+      <div class="hintline center">听发音，拼写单词</div>
+      <input class="input mt16" id="answer" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="输入你听到的单词">
+      <button class="btn primary block mt10" data-act="submit">提交</button>`;
+  }else if(e.type==='spellMeaning'){
+    body=`<div class="meaning big">${esc(w.m||'')}</div>
+      <div class="hintline center">看释义，拼写单词</div>
+      <input class="input mt16" id="answer" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="输入英文单词">
+      <button class="btn primary block mt10" data-act="submit">提交</button>`;
+  }else if(e.type==='choiceAudio'){
+    body=`<div class="center"><button class="bigplay" data-act="play" data-w="${esc(w.w)}">🔊</button></div>
+      <div class="hintline center">听发音，选择正确的释义</div>${optionButtons(e)}`;
+  }else if(e.type==='choiceEn2Cn'){
+    body=`<div class="word-line"><span class="word">${esc(w.w)}</span>
+        <button class="icon" data-act="play" data-w="${esc(w.w)}">🔊</button></div>
+      <div class="hintline center">选择正确的释义</div>${optionButtons(e)}`;
+  }else{
+    body=`<div class="meaning big">${esc(w.m||'')}</div>
+      <div class="hintline center">选择正确的单词</div>${optionButtons(e)}`;
+  }
+  return `<div class="card study"><div class="row gap8" style="justify-content:center;margin-bottom:6px">${tags}</div>${body}</div>`;
+}
+
+function cardFinish(){
+  const n=DB.session?DB.session.entries.length:0;
+  return `<div class="card study">
+    <div class="done-emoji">🎉</div>
+    <h2>本轮完成</h2>
+    <p class="muted">共 ${n} 个环节</p>
+    <button class="btn primary block mt10" data-act="tab" data-tab="report">查看背词报告</button>
+    <div class="row gap8 mt10">
+      <button class="btn ghost" data-act="start" data-kind="mix">再来一轮</button>
+      <button class="btn ghost" data-act="endSession">回到首页</button>
+    </div>
+  </div>`;
+}
+
+/* ---------------- 词库（粘贴即录入） ---------------- */
+function viewBank(){
+  const q=UI.bankQuery.trim().toLowerCase(),f=UI.bankFilter;
+  const list=DB.words.filter(w=>{
+    if(q&&!(w.w.toLowerCase().includes(q)||(w.m||'').toLowerCase().includes(q)))return false;
+    if(f==='new')return w.status==='new';
+    if(f==='learning')return w.status==='learning';
+    if(f==='mastered')return w.status==='mastered';
+    if(f==='repeat')return (w.repeatsLeft||0)>0;
+    return true;
+  }).slice().reverse();
+
+  const chips=[['all','全部'],['new','新词'],['learning','学习中'],['repeat','待强化'],['mastered','已掌握']]
+    .map(([k,t])=>`<button class="chip ${UI.bankFilter===k?'on':''}" data-act="filter" data-f="${k}">${t}</button>`).join('');
+
+  const rows=list.length?list.map(w=>`
+    <div class="wrow">
+      <div style="flex:1;min-width:0">
+        <div class="w">${esc(w.w)}
+          ${w.status==='mastered'?'<span class="tag gray">已掌握</span>':''}
+          ${(w.repeatsLeft||0)>0?`<span class="tag warn">待强化 ${w.repeatsLeft}</span>`:''}
+        </div>
+        <div class="m">${esc(w.m||'（无释义）')}${w.ph?` · ${esc(w.ph)}`:''}</div>
+        <div class="m">对 ${w.right||0} / 错 ${w.wrong||0}</div>
+      </div>
+      <div class="acts">
+        <button class="mini" data-act="play" data-w="${esc(w.w)}">🔊</button>
+        <button class="mini" data-act="toggleStatus" data-id="${w.id}">${w.status==='mastered'?'恢复':'已掌握'}</button>
+        <button class="mini" data-act="delWord" data-id="${w.id}">删</button>
+      </div>
+    </div>`).join(''):`<div class="muted center" style="padding:20px 0">暂无匹配的单词</div>`;
+
+  return `
+  <div class="card">
+    <div class="row-between" style="margin-bottom:8px">
+      <h2 style="margin:0">粘贴录入总词库</h2>
+      <span class="tag gray">现有 ${DB.words.length} 个</span>
+    </div>
+    <textarea id="bulk" placeholder="把整份词表粘贴到这里，一行一个词。支持：
+abandon v. 放弃；抛弃
+archive /ˈɑːkaɪv/ n. 档案；档案馆
+emboss | 浮雕；压花
+stammer, 结巴
+1. resilient 有弹性的
+serendipity（只有单词也可以）">${esc(UI.bulkText)}</textarea>
+    <div class="row-between mt10">
+      <span class="muted" id="bulkCount">—</span>
+      <button class="mini" data-act="clearBulk">清空</button>
+    </div>
+    <button class="btn primary block mt10" data-act="addBulk">加入总词库</button>
+    <div class="row gap8 mt10">
+      <button class="btn ghost" data-act="replaceBulk">替换整个词库</button>
+      <button class="btn ghost" data-act="sample">填入示例</button>
+      <button class="btn ghost" data-act="export">导出备份</button>
+    </div>
+    <div class="muted mt10">重复单词会自动跳过；旧记录缺释义时会自动补全。没有中文释义的词只能做「听音拼写」。</div>
+  </div>
+
+  <div class="card">
+    <input class="input" style="text-align:left;font-size:15px;padding:11px" id="bankSearch"
+      placeholder="搜索单词或释义" value="${esc(UI.bankQuery)}">
+    <div class="chips mt10">${chips}</div>
+    ${rows}
+    <div class="row gap8 mt10">
+      <button class="btn ghost" data-act="import">从文件导入 JSON</button>
+      <button class="btn ghost" data-act="delAll">清空词库</button>
+    </div>
+  </div>`;
+}
+
+/* ---------------- 报告 ---------------- */
+function dedupeErrors(errs){
+  const map=new Map();
+  errs.forEach(e=>map.set(e.wordId,e));
+  return Array.from(map.values()).reverse();
+}
+function ringSVG(pct){
+  const C=2*Math.PI*52;
+  return `<svg viewBox="0 0 120 120" class="ring">
+    <circle cx="60" cy="60" r="52" fill="none" stroke="#eef2f5" stroke-width="14"/>
+    <circle cx="60" cy="60" r="52" fill="none" stroke="#10b981" stroke-width="14"
+      stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-pct/100)).toFixed(1)}"
+      stroke-linecap="round" transform="rotate(-90 60 60)"/>
+  </svg>`;
+}
+function barLine(label,val,max,color){
+  const w=max>0?Math.round(val/max*100):0;
+  return `<div class="barline"><span class="lbl">${label}</span>
+    <span class="track"><i style="width:${w}%;background:${color}"></i></span>
+    <span class="val">${val} 个</span></div>`;
+}
+function viewReport(){
+  const d=UI.reportDate;
+  const hist=DB.history[d]||{learn:{new:{know:0,hint:0,unknown:0},review:{know:0,hint:0,unknown:0}},tests:{},errors:[]};
+  const L=hist.learn||{new:{},review:{}},tests=hist.tests||{};
+  let totalT=0,rightT=0;
+  Object.values(tests).forEach(t=>{totalT+=t.total||0;rightT+=t.right||0});
+  const acc=totalT?Math.round(rightT/totalT*100):0;
+  const maxN=Math.max(1,L.new.know||0,L.new.hint||0,L.new.unknown||0);
+  const maxR=Math.max(1,L.review.know||0,L.review.hint||0,L.review.unknown||0);
+  const errs=dedupeErrors(hist.errors||[]);
+
+  const typeRows=Object.keys(tests).filter(k=>tests[k].total>0).map(k=>{
+    const t=tests[k],p=Math.round(t.right/t.total*100);
+    return `<tr><td>${TYPES[k]||k}</td><td class="${p>=80?'g':(p>=60?'':'r')}">${p}%</td>
+      <td>${t.total}</td><td>${t.total-t.right}</td></tr>`;
+  }).join('')||`<tr><td colspan="4" class="muted" style="padding:18px">今日暂无测试记录</td></tr>`;
+
+  const errHTML=errs.length?errs.map(e=>{
+    const w=byId(e.wordId);if(!w)return '';
+    return `<div class="err">
+      <div class="w">${esc(w.w)}<button class="mini" data-act="play" data-w="${esc(w.w)}">🔊</button></div>
+      <div class="meta">${w.ph?esc(w.ph)+' · ':''}${esc(w.m||'')}</div>
+      <div class="meta">待强化：<span class="tag warn">${TYPES[e.type]||'背词'}</span>
+        我的答案：${esc(e.answer)}</div>
+    </div>`;
+  }).join(''):`<div class="muted center" style="padding:20px 0">这一天没有错词，太棒了 🎉</div>`;
+
+  return `
+  <div class="card">
+    <div class="row-between">
+      <button class="mini" data-act="repDay" data-n="-1">‹ 前一天</button>
+      <b>${d}</b>
+      <button class="mini" data-act="repDay" data-n="1">后一天 ›</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">新词学习</div>
+    ${barLine('认识',L.new.know||0,maxN,'#10b981')}
+    ${barLine('提示',L.new.hint||0,maxN,'#cbd5e1')}
+    ${barLine('不认识',L.new.unknown||0,maxN,'#f43f5e')}
+  </div>
+
+  <div class="card">
+    <div class="sec-title">旧词复习</div>
+    ${barLine('认识',L.review.know||0,maxR,'#10b981')}
+    ${barLine('提示',L.review.hint||0,maxR,'#cbd5e1')}
+    ${barLine('不认识',L.review.unknown||0,maxR,'#f43f5e')}
+  </div>
+
+  <div class="card">
+    <div class="sec-title">测试分析</div>
+    <div class="ring-wrap">
+      ${ringSVG(totalT?acc:0)}
+      <div class="ring-num">
+        <b>${totalT}</b>个词<div style="margin-top:8px">正确率 <b style="display:inline;font-size:17px;color:#10b981">${acc}%</b></div>
+        <div style="margin-top:6px">
+          <span style="color:#10b981">● 正确 ${rightT}</span>　
+          <span style="color:#f43f5e">● 错误 ${totalT-rightT}</span>
+        </div>
+      </div>
+    </div>
+    <table class="tbl">
+      <tr><th>题型</th><th>我的正确率</th><th>题数</th><th>错题</th></tr>
+      ${typeRows}
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">我的错词 (${errs.length})</div>
+    ${errHTML}
+  </div>
+
+  <div class="card">
+    <button class="btn primary block" data-act="share">分享今日报告</button>
+  </div>`;
+}
+
+/* ---------------- 设置面板 ---------------- */
+function sheet(){
+  const s=DB.settings;
+  const tgs=Object.keys(TYPES).map(k=>
+    `<button class="tg ${s.types.includes(k)?'on':''}" data-act="toggleType" data-t="${k}">${TYPES[k]}</button>`).join('');
+  return `<div class="overlay" data-act="closeSheetBg">
+    <div class="sheet" data-act="noop">
+      <h3>计划设置</h3>
+      <label>每日新学词数 <input type="number" id="sNew" min="0" max="300" value="${s.newPerDay}"></label>
+      <label>每日复习词数 <input type="number" id="sRev" min="0" max="500" value="${s.reviewPerDay}"></label>
+      <label>单独测试词数 <input type="number" id="sTest" min="0" max="300" value="${s.testPerDay}"></label>
+      <label>发音速度 <input type="number" id="sRate" min="0.5" max="1.5" step="0.1" value="${s.rate}"></label>
+      <div style="margin:14px 0 6px;font-size:14px;font-weight:600">测试题型</div>
+      <div class="tgs">${tgs}</div>
+      <div class="row gap8 mt16">
+        <button class="btn ghost" data-act="closeSheet">取消</button>
+        <button class="btn primary" style="flex:1" data-act="saveSettings">保存</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ================= 交互 ================= */
+function afterRender(){
+  const cur=currentEntry();
+  if(cur&&cur.entry.mode==='test'&&!UI.feedback&&
+     (cur.entry.type==='spellAudio'||cur.entry.type==='choiceAudio')){
+    if(UI.playedFor!==cur.entry.id){
+      UI.playedFor=cur.entry.id;
+      const w=byId(cur.entry.wordId);
+      if(w)speak(w.w);
+    }
+  }
+  const inp=document.getElementById('answer');
+  if(inp){
+    inp.focus();
+    inp.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();onSubmitSpell()}});
+  }
+  updateBulkCount();
+}
+
+function updateBulkCount(){
+  const el=document.getElementById('bulkCount');
+  if(!el)return;
+  if(!UI.bulkText.trim()){el.textContent='—';return}
+  const s=bulkStats();
+  el.textContent=`识别到 ${s.total} 个 · 新增 ${s.add} · 已在词库 ${s.dup}${s.bad?` · 忽略 ${s.bad} 行`:''}`;
+}
+
+let bulkTimer=null;
+document.addEventListener('input',ev=>{
+  if(ev.target.id==='bankSearch')UI.bankQuery=ev.target.value;
+  if(ev.target.id==='bulk'){
+    UI.bulkText=ev.target.value;
+    clearTimeout(bulkTimer);
+    bulkTimer=setTimeout(updateBulkCount,120);
+  }
+});
+
+/* ====== 写入总词库 ====== */
+function addToBank(text,replace){
+  const {items,bad}=parseBulk(text);
+  if(!items.length){toast('没有识别到单词，检查一下格式');return}
+
+  if(replace){
+    if(!confirm(`将用粘贴的 ${items.length} 个单词替换现有 ${DB.words.length} 个单词，进度也会重置。确定？`))return false;
+    DB.words=[];DB.session=null;DB.progress={};
+  }
+
+  const exist=new Map(DB.words.map(w=>[w.w.toLowerCase(),w]));
+  let added=0,updated=0,dup=0;
+  items.forEach(r=>{
+    const key=r.w.toLowerCase();
+    const ex=exist.get(key);
+    if(ex){
+      dup++;
+      if(r.m&&(!ex.m||ex.m.length<r.m.length)){ex.m=r.m;updated++}
+      if(r.ph&&!ex.ph)ex.ph=r.ph;
+      return;
+    }
+    const w={id:uid(),w:r.w,m:r.m||'',ph:r.ph||'',status:'new',seen:0,right:0,wrong:0,
+      lastSeen:0,nextDue:todayStr(),repeatsLeft:0,weak:null,createdAt:Date.now()+added};
+    DB.words.push(w);exist.set(key,w);added++;
+  });
+
+  saveDB();
+  toast(`新增 ${added} 个${dup?` · 已存在 ${dup} 个`:''}${updated?` · 补释义 ${updated}`:''}${bad?` · 跳过 ${bad} 行`:''}`);
+  return true;
+}
+
+document.addEventListener('click',ev=>{
+  const el=ev.target.closest('[data-act]');
+  if(!el)return;
+  const act=el.dataset.act,d=el.dataset;
+
+  if(act==='noop'){ev.stopPropagation();return}
+
+  switch(act){
+    case 'tab':
+      UI.tab=d.tab;UI.feedback=null;
+      if(d.tab==='report')UI.reportDate=todayStr();
+      render();break;
+
+    case 'start': startSession(d.kind);break;
+    case 'endSession': DB.session=null;UI.feedback=null;saveDB();render();break;
+    case 'play': speak(d.w);break;
+    case 'learn': onLearn(d.res);break;
+    case 'submit': onSubmitSpell();break;
+
+    case 'choose': {
+      const cur=currentEntry();if(!cur||UI.feedback)break;
+      const e=cur.entry,w=byId(e.wordId);
+      UI.choicePicked=d.val;
+      finishTest(e,w,d.val===e.opts.answer,d.val);
+      break;
+    }
+
+    case 'next': UI.feedback=null;UI.choicePicked=null;saveDB();render();break;
+    case 'filter': UI.bankFilter=d.f;render();break;
+
+    case 'toggleStatus': {
+      const w=byId(d.id);if(!w)break;
+      if(w.status==='mastered'){w.status='learning';w.repeatsLeft=0;w.nextDue=todayStr()}
+      else {w.status='mastered';w.repeatsLeft=0;w.masteredAt=Date.now()}
+      saveDB();render();break;
+    }
+
+    case 'delWord': {
+      const w=byId(d.id);if(!w)break;
+      if(confirm('删除 '+w.w+' ?')){
+        DB.words=DB.words.filter(x=>x.id!==d.id);
+        saveDB();render();
+      }
+      break;
+    }
+
+    case 'delAll': {
+      if(!DB.words.length){toast('词库已经是空的');break}
+      if(confirm('清空整个词库？所有单词和学习进度都会删除，建议先导出备份。')){
+        DB.words=[];DB.session=null;DB.progress={};saveDB();
+        UI.bulkText='';toast('已清空');render();
+      }
+      break;
+    }
+
+    case 'addBulk': {
+      if(addToBank(UI.bulkText,false)){UI.bulkText='';render()}
+      break;
+    }
+    case 'replaceBulk': {
+      if(addToBank(UI.bulkText,true)){UI.bulkText='';render()}
+      break;
+    }
+    case 'clearBulk': UI.bulkText='';render();break;
+
+    case 'sample': {
+      UI.bulkText=[
+        'abandon v. 放弃；抛弃',
+        'archive /ˈɑːkaɪv/ n. 档案；档案馆',
+        'emboss | 浮雕；压花',
+        'stammer, 结巴',
+        'pulverise\t/ˈpʌlvəraɪz/\t粉碎',
+        '1. resilient 有弹性的；能恢复的',
+        '2) ambiguous 模糊的；歧义的',
+        'serendipity'
+      ].join('\n');
+      render();break;
+    }
+
+    case 'export': {
+      const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='vocab-backup-'+todayStr()+'.json';
+      a.click();break;
+    }
+
+    case 'import': {
+      const inp=document.createElement('input');
+      inp.type='file';inp.accept='.json,application/json';
+      inp.onchange=()=>{
+        const f=inp.files[0];if(!f)return;
+        const rd=new FileReader();
+        rd.onload=()=>{
+          try{
+            const o=JSON.parse(rd.result);
+            if(!o.words)throw 0;
+            const base=DEFAULT_DB();
+            DB=Object.assign(base,o,{settings:Object.assign(base.settings,o.settings||{})});
+            saveDB();toast('导入成功');render();
+          }catch(e){toast('文件格式不正确')}
+        };
+        rd.readAsText(f);
+      };
+      inp.click();break;
+    }
+
+    case 'repDay': UI.reportDate=addDays(UI.reportDate,parseInt(d.n,10));render();break;
+
+    case 'share': {
+      const hist=DB.history[UI.reportDate]||{learn:{new:{},review:{}},tests:{},errors:[]};
+      let tt=0,rr=0;Object.values(hist.tests||{}).forEach(t=>{tt+=t.total||0;rr+=t.right||0});
+      const errs=dedupeErrors(hist.errors||[]);
+      const txt=`【背词报告 ${UI.reportDate}】
+新词：认识 ${hist.learn.new.know||0} / 提示 ${hist.learn.new.hint||0} / 不认识 ${hist.learn.new.unknown||0}
+复习：认识 ${hist.learn.review.know||0} / 提示 ${hist.learn.review.hint||0} / 不认识 ${hist.learn.review.unknown||0}
+测试：${tt} 题，正确率 ${tt?Math.round(rr/tt*100):0}%（正确 ${rr} / 错误 ${tt-rr}）
+错词：${errs.map(e=>{const w=byId(e.wordId);return w?w.w:''}).filter(Boolean).join('、')||'无'}`;
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(()=>toast('报告已复制到剪贴板'),()=>prompt('复制以下内容',txt));
+      }else prompt('复制以下内容',txt);
+      break;
+    }
+
+    case 'openSettings': UI.settingsOpen=true;render();break;
+    case 'closeSheet': UI.settingsOpen=false;render();break;
+    case 'closeSheetBg': if(ev.target===el){UI.settingsOpen=false;render()}break;
+
+    case 'toggleType': {
+      const t=d.t,i=DB.settings.types.indexOf(t);
+      if(i>=0)DB.settings.types.splice(i,1);else DB.settings.types.push(t);
+      if(!DB.settings.types.length)DB.settings.types.push('spellMeaning');
+      render();break;
+    }
+
+    case 'saveSettings': {
+      const g=id=>document.getElementById(id);
+      DB.settings.newPerDay=Math.max(0,parseInt(g('sNew').value,10)||0);
+      DB.settings.reviewPerDay=Math.max(0,parseInt(g('sRev').value,10)||0);
+      DB.settings.testPerDay=Math.max(0,parseInt(g('sTest').value,10)||0);
+      DB.settings.rate=Math.min(1.5,Math.max(.5,parseFloat(g('sRate').value)||.9));
+      UI.settingsOpen=false;saveDB();toast('已保存');render();break;
+    }
+  }
+});
+
+/* ================= Toast ================= */
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ================= 启动 ================= */
+render();
+</script>
+</body>
+</html>
