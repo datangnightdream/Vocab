@@ -204,18 +204,24 @@ function speak(text){
   }catch(e){toast('发音失败')}
 }
 
-/* ================= 词条解析（核心：支持任意粘贴格式） ================= */
+/* ================= 词条解析 ================= */
 function parseLine(raw){
   let line=String(raw==null?'':raw).replace(/\u00a0/g,' ').replace(/\u3000/g,' ').replace(/\t/g,'  ').trim();
   if(!line)return null;
 
-  /* 去掉行首序号 / 项目符号 */
-  line=line.replace(/^[\s>*•·◦▪※#-–—]+/,'')
+  /* 去掉行首序号 / 项目符号（注意 - 必须转义） */
+  line=line.replace(/^[\s>*•·◦▪※#\-–—]+/,'')
            .replace(/^\d+\s*[\.、\)\]）:：]\s*/,'')
            .trim();
   if(!line)return null;
   if(!/[A-Za-z]/.test(line))return null;
-  if(/^(unit|lesson|module|chapter|part|list|word\s*list|vocabulary|第[一二三四五六七八九十百\d]{1,4}[课单列组页])/i.test(line))return null;
+
+  /* 跳过表头行：Unit 1 / Lesson 3 / Word List 5 / 第三课 … */
+  if(!/[\u4e00-\u9fa5]/.test(line)){
+    const t=line.replace(/[\s\d\.\-_:：、,，()（）【】\[\]第册页课单组列]/g,'');
+    if(t&&/^(unit|lesson|module|chapter|part|word|list|vocabulary|book|grade|level|review|exercise|test)+$/i.test(t))return null;
+  }
+
   line=line.replace(/\s{2,}/g,' ').trim();
 
   /* 抽取音标：只认带 IPA 符号的 /.../ 或 [...] */
@@ -300,7 +306,7 @@ function newEntry(w,mode,extra){
   const e={id:uid(),wordId:w.id,mode,done:false,result:null,repeat:false,kind:'review'};
   if(mode==='test'){
     let t=pickType(w);
-    if(!w.m)t='spellAudio';            /* 没有中文释义 → 只能听音拼写 */
+    if(!w.m)t='spellAudio';
     e.type=t;
     if(CHOICE.has(t)){
       const o=makeOptions(w,t);
@@ -352,7 +358,7 @@ function startSession(kind){
   saveDB();render();
 }
 
-/* 错词穿插：间隔 4 / 9 / 16 个环节，并跨"背词区 / 测试区" */
+/* 错词穿插：间隔 4 / 9 / 16 个环节 */
 function scheduleRepeat(w,fromIndex,attempt){
   if(!DB.session)return;
   const entries=DB.session.entries;
@@ -630,7 +636,7 @@ function cardFinish(){
   </div>`;
 }
 
-/* ---------------- 词库（粘贴即录入） ---------------- */
+/* ---------------- 词库 ---------------- */
 function viewBank(){
   const q=UI.bankQuery.trim().toLowerCase(),f=UI.bankFilter;
   const list=DB.words.filter(w=>{
@@ -861,7 +867,7 @@ document.addEventListener('input',ev=>{
 /* ====== 写入总词库 ====== */
 function addToBank(text,replace){
   const {items,bad}=parseBulk(text);
-  if(!items.length){toast('没有识别到单词，检查一下格式');return}
+  if(!items.length){toast('没有识别到单词，检查一下格式');return false}
 
   if(replace){
     if(!confirm(`将用粘贴的 ${items.length} 个单词替换现有 ${DB.words.length} 个单词，进度也会重置。确定？`))return false;
